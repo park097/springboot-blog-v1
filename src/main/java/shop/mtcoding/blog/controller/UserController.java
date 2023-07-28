@@ -1,17 +1,38 @@
 package shop.mtcoding.blog.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import shop.mtcoding.blog.dto.JoinDTO;
+import shop.mtcoding.blog.repository.UserRepository;
 @Controller
 public class UserController {
-    // 정상인
+
+
+     @Autowired
+    private UserRepository userRepository;
+
+    //  실무
     @PostMapping("/join")
-    public String join(String username, String password, String email) {
-        // username=ssar&password=1234&email=ssar@nate.com
-        System.out.println("username : " + username);
-        System.out.println("password : " + password);
-        System.out.println("email : " + email);
+    public String join(JoinDTO joinDTO) {
+       //validation check 유효성검사
+        if (joinDTO.getUsername() == null || joinDTO.getUsername().isEmpty())
+      {
+          return "redirect:/40x";
+      }
+        if (joinDTO.getPassword() == null || joinDTO.getPassword().isEmpty())
+      {
+          return "redirect:/40x";
+      }
+        if (joinDTO.getEamil() == null || joinDTO.getEamil().isEmpty())
+      {
+          return "redirect:/40x";
+      }
+      
+       
+        userRepository.save(joinDTO); //핵심기능
         return "redirect:/loginForm";
     }
     // 비정상
@@ -62,4 +83,6 @@ public class UserController {
     public String logout() {
         return "redirect:/";
     }
+
+
 }
