@@ -31,8 +31,13 @@ public class UserController {
           return "redirect:/40x";
       }
       
-       
+       try {
         userRepository.save(joinDTO); //핵심기능
+        
+       } catch (Exception e) {
+        return "redirect:/50x";
+       }
+        
         return "redirect:/loginForm";
     }
     // 비정상
