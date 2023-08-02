@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import shop.mtcoding.blog.dto.UpdateDTO;
 import shop.mtcoding.blog.dto.WriteDTO;
 import shop.mtcoding.blog.model.Board;
 import shop.mtcoding.blog.model.User;
@@ -26,25 +27,62 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
+    @PostMapping("/board/{id}/update")
+    public String update(@PathVariable Integer id, UpdateDTO updateDTO) {
+        //1,인증검사
+
+        //2,권한체크
+
+        //3,핵심 로직
+        //updqte board_tb set title = :title,content = :content where id = :id
+        boardRepository.update(updateDTO, id);
+
+        return "redirect:/board/"+id;
+    }
+
+    @GetMapping("/board/{id}/updateForm")
+    public String updateForm(@PathVariable Integer id, HttpServletRequest request){
+        //1,인증검사
+        
+        //2,권한 체크
+
+        //3,핵심 로직 
+        Board board = boardRepository.finById(id);
+        request.setAttribute("board", board);
+        
+        return "board/updateForm";
+
+    }
+
     @PostMapping("/board/{id}/delete")
-    public String delete(@PathVariable Integer id ,HttpServletRequest request ){ //1,PathVariable 값 받기
+    public String delete(@PathVariable Integer id) { //1,PathVariable 값 받기
         //2,인증검사 (로그인 페이지 보내기)
 
         //session에 접근해서 sessionUser 키값을 가져오세요
         User sessionUser = (User) session.getAttribute("sessionUser");
         //null이면 , 로그인페이지로 보내고
         //null아니면, 3번을 실행하세요
-         boolean pageOwner = false;
-        if(sessionUser != null){
-           boardRepository.deleteById(id);
-
+       
+        if(sessionUser == null){
+          
+            return "redirect:/loginForm"; //401 
         }
        
         //3,모델에 접근해서 삭제(db필요) 
         //boardRepository.deleteById(id); 호출하세요 -->리턴을 받지 마세요
         //delete from board_tb where id =:id
 
-          return "user/loginForm";
+
+        //3,권한검사
+
+        Board board = boardRepository.finById(id);
+        if (board.getUser().getId() != sessionUser.getId()){
+            return "redirect:/40x"; //403 권한없음
+        }
+
+      boardRepository.deleteById(id);
+
+      return"redirect:/";
        
     }
 
