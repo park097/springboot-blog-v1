@@ -21,6 +21,9 @@ public class UserController {
     @Autowired
     private HttpSession session; // request는 가방, session은 서랍
 
+   
+
+
     @PostMapping("/login")
     public String login(LoginDTO loginDTO) {
         if (loginDTO.getUsername() == null || loginDTO.getUsername().isEmpty()) {
@@ -112,6 +115,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public String logout() {
+        session.invalidate();//(서랍을 비우는 것)
         return "redirect:/";
     }
 
