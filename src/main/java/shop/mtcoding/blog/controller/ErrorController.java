@@ -14,7 +14,13 @@ public class ErrorController {
     
     @GetMapping("/40x")
      public String ex40x(){
-        return "error/ex40x";
+      StringBuilder sb = new StringBuilder();
+      sb.append("<script>");
+      sb.append("alert('잘못된 요청을 하였습니다');");
+      sb.append("history.back();");
+      sb.append("</script>");
+
+        return sb.toString();
      }
     @GetMapping("/50x")
      public String ex50x(){

@@ -21,12 +21,12 @@ public class BoardRepository {
     @Autowired
     private EntityManager em;
 
-    //select id, title from board_tb
-    //resultclass 안붙이고 직접 파싱하려면
-    //object[0] 로 리턴됨
-    //objext[0]=1
-    //objext[1]=제목1
- 
+    // select id, title from board_tb
+    // resultclass 안붙이고 직접 파싱하려면
+    // object[0] 로 리턴됨
+    // objext[0]=1
+    // objext[1]=제목1
+
     public int count() {
         Query query = em.createNativeQuery("select count(*) from board_tb");
         // 원래는 Object 배열로 리턴 받는다, Object 배열은 칼럼의 연속이다.
@@ -41,7 +41,6 @@ public class BoardRepository {
         List<Board> boardList = query.getResultList();
         return boardList.size();
     }
-
 
     // localhost:8080?page=0
     public List<Board> findAll(int page) {
@@ -64,34 +63,30 @@ public class BoardRepository {
         query.executeUpdate();
     }
 
-    public Board finById(Integer id) {
-        Query query = em.createNativeQuery("select * from board_tb where id = :id" , Board.class);
+    public Board findById(Integer id) {
+        Query query = em.createNativeQuery("select * from board_tb where id = :id", Board.class);
         query.setParameter("id", id);
         Board board = (Board) query.getSingleResult();
-        
-        return board;
 
+        return board;
 
     }
 
     @Transactional
-   public void deleteById(Integer id) {
-    Query query = em.createNativeQuery("delete from board_tb where id = :id");
-    query.setParameter("id", id);
-    query.executeUpdate();
-}
+    public void deleteById(Integer id) {
+        Query query = em.createNativeQuery("delete from board_tb where id = :id");
+        query.setParameter("id", id);
+        query.executeUpdate();
+    }
 
-   
-    @Transactional //이게 끝나면 자동으로 커밋을 해주고 실패하면  롤백해줌
+    @Transactional // 이게 끝나면 자동으로 커밋을 해주고 실패하면 롤백해줌
     public void update(UpdateDTO updateDTO, Integer id) {
-        Query query = em.createNativeQuery("update board_tb set title = :title,content = :content where id = :id");
-    query.setParameter("id", id);
-    query.setParameter("title", updateDTO.getTitle());
-    query.setParameter("content", updateDTO.getContent());
-   
-    query.executeUpdate();
+        Query query = em.createNativeQuery("update board_tb set title = :title, content = :content where id = :id");
+        query.setParameter("title", updateDTO.getTitle());
+        query.setParameter("id", id);
+        query.setParameter("content", updateDTO.getContent());
+
+        query.executeUpdate();
     }
-   
-        
-      
-    }
+
+}
