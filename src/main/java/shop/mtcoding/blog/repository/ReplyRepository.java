@@ -52,8 +52,12 @@ public class ReplyRepository {
         query.setParameter("id", id);
         query.executeUpdate();
     }
-
-
+    }
+    public Reply findById(int id) {
+        Query query = em.createNativeQuery("select * from reply_tb where id = :id", Reply.class);
+        query.setParameter("id", id);
+        return (Reply) query.getSingleResult();
+      
     
 }
 

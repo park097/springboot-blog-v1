@@ -55,14 +55,22 @@ public class ReplyController {
         // session에 접근해서 sessionUser 키값을 가져오세요
         // null 이면, 로그인페이지로 보내고
         // null 아니면, 3번을 실행하세요.
+
+        //유효성 검사
+         if (boardId == null) {
+            return "redirect:/40x";
+        }
+
+
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
-            return "redirect:/board"; // 401
+            return "redirect:/loginForm"; // 401
+        }
             // }
-            // //권한검사
-            // List<Reply> reply = replyRepository.findByBoardId(id);
-            // if ( reply.getId() != sessionUser.getId()) {
-            // return "redirect:/40x"; // 403 권한없음
+            //권한검사
+            Reply reply = replyRepository.findById(id);
+            if ( reply.getUser().getId() != sessionUser.getId()) {
+            return "redirect:/40x"; // 403 권한없음
         }
 
         // 4. 모델에 접근해서 삭제
@@ -75,3 +83,4 @@ public class ReplyController {
 
     }
 }
+

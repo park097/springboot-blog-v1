@@ -166,7 +166,7 @@ public class BoardController {
     public String detail(@PathVariable Integer id, HttpServletRequest request) { // C
         User sessionUser = (User) session.getAttribute("sessionUser"); // 세션접근
         
-        //동적쿼리 
+        //동적쿼리 (상황에 따라 달라지니까)
         List<BoardDetailDTO> dtos = null;
         if (sessionUser == null) {
             dtos = boardRepository.findByIdJoinReply(id, null);
