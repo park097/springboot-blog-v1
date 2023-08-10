@@ -3,12 +3,15 @@ package shop.mtcoding.blog.repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UpdateDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.User;
 
 // BoardController, UserController, UserRepository
@@ -39,19 +42,33 @@ public class UserRepository {
         return (User) query.getSingleResult();
     }
 
-    @Transactional
+@Transactional // 일을최소단위 일 마다 다다름 하나라고 실패하면 롤백 다됫음면커밋
     public void save(JoinDTO joinDTO) {
-        System.out.println("테스트 :" + 1);
+        String Password = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
+        System.out.println("테스트:" + 1);
+        Query query = em.createNativeQuery(
+                "insert into user_tb(username, password, email) values(:username, :password, :email)");
+        System.out.println("테스트:" + 2);
+        query.setParameter("username", joinDTO.getUsername());
+        query.setParameter("password", Password);
+        query.setParameter("email", joinDTO.getEmail());
+
+        System.out.println("테스트:" + 3);
+
+        query.executeUpdate(); // 쿼리전송(DBMS)
+        System.out.println("테스트:" + 4);
+    }
+
+     @Transactional
+    public void update(UserUpdateDTO userUpdateDTO, Integer id) {
         Query query = em
                 .createNativeQuery(
-                        "insert into user_tb(username, password, email) values(:username, :password, :email)");
-        System.out.println("테스트 :" + 2);
-        query.setParameter("username", joinDTO.getUsername());
-        query.setParameter("password", joinDTO.getPassword());
-        query.setParameter("email", joinDTO.getEmail());
-        System.out.println("테스트 :" + 3);
-        query.executeUpdate(); // 쿼리를 전송 (DBMS)
-        System.out.println("테스트 :" + 4);
+                        "update user_tb set password = :password where id = :id");
+        query.setParameter("id", id);
+        String Password = BCrypt.hashpw(userUpdateDTO.getPassword(), BCrypt.gensalt());
+        query.setParameter("password", Password);
+        
+        query.executeUpdate();
     }
 }
 
