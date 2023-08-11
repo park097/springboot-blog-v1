@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import shop.mtcoding.blog.dto.JoinDTO;
 import shop.mtcoding.blog.dto.LoginDTO;
+import shop.mtcoding.blog.dto.UserUpdateDTO;
 import shop.mtcoding.blog.model.SessionUser;
 import shop.mtcoding.blog.model.User;
 import shop.mtcoding.blog.repository.UserRepository;
@@ -88,13 +89,9 @@ public class UserController {
 
         String encPassword = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
         joinDTO.setPassword(encPassword);
-
-        System.out.println("Hashed Password: " + encPassword);
-        
-        
+        System.out.println(encPassword.length());
 
         userRepository.save(joinDTO); // 핵심 기능
-
         return "redirect:/loginForm";
     }
 
@@ -114,24 +111,61 @@ public class UserController {
         return "user/loginForm";
     }
 
+    //회원정보 수정 페이지
     @GetMapping("/user/updateForm")
     public String updateForm(HttpServletRequest request) {
+        // 인증 검사
         User sessionUser = (User) session.getAttribute("sessionUser");
         if (sessionUser == null) {
-            return "redirect:/loginForm"; // 401
+            return "redirect:/loginForm";
         }
 
-        User user = userRepository.findByUsername(sessionUser.getUsername());
-        request.setAttribute("user", user);
+        // 권한 검사 할 필요 없음
+        // 왜 WHY? -> 세션으로 접근하기 때문에
 
+        // 왜 findById로 할까?
+        // id는 PK이기 때문에 인덱스를 타기 때문에
+        // username도 UK라서 가능함.
+        User user = userRepository.findByUsername(sessionUser.getUsername());
+
+        request.setAttribute("user", user);
         return "user/updateForm";
     }
-
     @GetMapping("/logout")
     public String logout() {
         session.invalidate(); // 세션 무효화 (내 서랍을 비우는 것)
         return "redirect:/";
     }
+
+   // 회원정보수정
+   @PostMapping("/user/{id}/update")
+   public String update(@PathVariable Integer id, UserUpdateDTO userUpdateDTO) {
+       // 1. 인증 검사
+       User sessionUser = (User) session.getAttribute("sessionUser");
+       if (sessionUser == null) {
+          
+           return "redirect:/loginForm";
+       }
+       System.out.println("인증검사 통과");
+       // // 2. 권한 체크
+       User user = userRepository.findById(id);
+       if (user.getId() != sessionUser.getId()) {
+          
+           return "redirect:/loginForm";
+       }
+       // 3. 유효성 검사(부가 로직)
+       if (user.getUsername() == null || user.getUsername().isEmpty()) {
+           return "redirect:/40x";
+       }
+       if (user.getPassword() == null || user.getPassword().isEmpty()) {
+           return "redirect:/40x";
+       }
+            // 4. 핵심 기능
+      
+       userRepository.update(userUpdateDTO, id);
+       return "redirect:/";
+   }
+    
 
     // 정상인
     // @PostMapping("/join")

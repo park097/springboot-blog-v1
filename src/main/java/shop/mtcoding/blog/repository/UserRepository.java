@@ -70,7 +70,19 @@ public class UserRepository {
         
         query.executeUpdate();
     }
-}
+
+    
+         // User id를 통한 상세보기
+    public User findById(Integer id) {
+        // 1. 쿼리문 작성 및 Board 클래스 매핑
+        Query query = em.createNativeQuery("select * from user_tb where id = :id", User.class);
+        // 2. 변수 바인딩
+        query.setParameter("id", id);
+        // 3. 리턴
+        return (User) query.getSingleResult();
+    }
+    }
+
 
      
 
